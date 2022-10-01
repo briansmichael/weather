@@ -216,7 +216,7 @@ public class WeatherService {
      * @return {@link METAR}
      * @throws ResourceNotFoundException when no information is found for the given ID
      */
-    private METAR getMETAR(final String icaoCode) throws ResourceNotFoundException {
+    public METAR getMETAR(final String icaoCode) throws ResourceNotFoundException {
         METAR cachedMetar = null;
         Optional<WeatherProduct> weatherProductOpt =
                 weatherProductRepository.findByKey(METAR_KEY + icaoCode);
@@ -240,7 +240,7 @@ public class WeatherService {
      * @param station to be validated
      * @return if station is valid
      */
-    private boolean isValidStation(final String station) {
+    public boolean isValidStation(final String station) {
         boolean response = false;
         final List<String> validStationsList = Arrays.asList(weatherProperties.getAtlantaIcaoCodes().split(","));
         if (validStationsList.contains(station)) {

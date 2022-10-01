@@ -14,15 +14,18 @@
  *  limitations under the License.
  */
 
-package com.starfireaviation.weather.service;
+package com.starfireaviation.weather.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starfireaviation.weather.config.WeatherProperties;
-import com.starfireaviation.weather.controller.WeatherController;
 import com.starfireaviation.weather.exception.InvalidPayloadException;
 import com.starfireaviation.weather.exception.ResourceNotFoundException;
 import com.starfireaviation.weather.model.METAR;
 import com.starfireaviation.weather.model.WeatherProduct;
+import com.starfireaviation.weather.model.WeatherProductRepository;
+import com.starfireaviation.weather.service.WeatherService;
+import com.starfireaviation.weather.util.SSLUtilities;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -31,6 +34,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -39,7 +43,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-public class WeatherServiceTests {
+public class WeatherControllerTests {
+
+    /**
+     * WeatherService.
+     */
+    @Mock
+    WeatherService weatherService;
 
     /**
      * WeatherProperties.
@@ -48,75 +58,23 @@ public class WeatherServiceTests {
     WeatherProperties weatherProperties;
 
     /**
-     * WeatherService.
+     * WeatherController.
      */
-    private WeatherService weatherService;
+    private WeatherController weatherController;
 
     /**
      * Test setup.
-     *
-     * @throws IOException when things go wrong
      */
     @BeforeEach
-    public void setup() throws IOException {
+    public void setup() {
         MockitoAnnotations.openMocks(this);
-
-        final File aviationWeatherResponse = new File("./src/test/resources/aviationweather_response.json");
-        final BufferedReader reader = new BufferedReader(new FileReader(aviationWeatherResponse));
-        final StringBuilder sb = new StringBuilder();
-        while (reader.ready()) {
-            sb.append(reader.readLine());
-        }
-        final ResponseEntity<String> response = ResponseEntity.of(Optional.of(sb.toString()));
-        Mockito
-                .doReturn(response)
-                .when(restTemplate)
-                .exchange(Mockito.anyString(), Mockito.eq(HttpMethod.GET), Mockito.any(), Mockito.eq(String.class));
 
         Mockito
                 .doReturn("KCNI,KGVL,KVPC,KJCA,KRYY,KLZU,KWDR,KPUJ,KMGE,KPDK,KFTY,"
                         + "KCTJ,KCVC,KATL,KCCO,KFFC,KHMP,KLGC,KOPN")
                 .when(weatherProperties).getAtlantaIcaoCodes();
 
-        Mockito.doNothing().when(sslUtilities).trustAllHostnames();
-        Mockito.doNothing().when(sslUtilities).trustAllHttpsCertificates();
-
-        Mockito.doReturn(new METAR()).when(objectMapper).readValue(Mockito.anyString(), Mockito.eq(METAR.class));
-        Mockito.doReturn("").when(objectMapper).writeValueAsString(Mockito.any());
-
-        final WeatherProduct weatherProduct = new WeatherProduct();
-        weatherProduct.setValue("{\"type\": \"Feature\",\"id\": \"803757662\",\"properties\": {\"data\": \"METAR\",\"id\": \"KATL\",\"site\": \"Atlanta/Hartsfield I\",\"prior\": 0,\"obsTime\": \"2022-02-27T16:04:00Z\",\"temp\": 9.4,\"dewp\": 8.3,\"wspd\": 4,\"wdir\": 120,\"ceil\": 7,\"cover\": \"OVC\",\"cldCvg1\": \"BKN\",\"cldBas1\": \"7\",\"cldCvg2\": \"OVC\",\"cldBas2\": \"26\",\"visib\": 2.50,\"fltcat\": \"IFR\",\"altim\": 1022.4,\"wx\": \"RA BR\",\"rawOb\": \"KATL 271604Z 12004KT 2 1/2SM RA BR BKN007 OVC026 09/08 A3019 RMK AO2 P0002 T00940083 $\"},\"geometry\": {\"type\": \"Point\",\"coordinates\": [-84.442,33.630]}}");
-        Mockito.doReturn(Optional.of(weatherProduct)).when(weatherProductRepository).findByKey(Mockito.anyString());
-
-        Mockito.doReturn(weatherProduct).when(weatherProductRepository).save(Mockito.any());
-
-        weatherService = new WeatherService(restTemplate, weatherProperties, sslUtilities,
-                objectMapper, weatherProductRepository);
-    }
-
-    /**
-     * Test update.
-     */
-    @Test
-    public void testUpdate() throws JsonProcessingException {
-        weatherService.updateWeather();
-
-        Mockito.verify(restTemplate, Mockito.times(1))
-                .exchange(Mockito.anyString(), Mockito.eq(HttpMethod.GET), Mockito.any(), Mockito.eq(String.class));
-        Mockito.verifyNoMoreInteractions(restTemplate);
-
-        Mockito.verify(sslUtilities, Mockito.times(1)).trustAllHostnames();
-        Mockito.verify(sslUtilities, Mockito.times(1)).trustAllHttpsCertificates();
-        Mockito.verifyNoMoreInteractions(sslUtilities);
-
-        Mockito.verify(objectMapper, Mockito.atLeast(1)).writeValueAsString(Mockito.any());
-        Mockito.verifyNoMoreInteractions(objectMapper);
-
-        Mockito.verify(weatherProductRepository, Mockito.atLeast(1)).findByKey(Mockito.anyString());
-        Mockito.verify(weatherProductRepository, Mockito.atLeast(1)).save(Mockito.any());
-        Mockito.verifyNoMoreInteractions(weatherProductRepository);
-
-        Mockito.verifyNoInteractions(weatherProperties);
+        weatherController = new WeatherController(weatherService, weatherProperties);
     }
 
     /**
