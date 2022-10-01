@@ -20,7 +20,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.starfireaviation.weather.config.WeatherConstants;
 import com.starfireaviation.weather.config.WeatherProperties;
-import com.starfireaviation.weather.exception.InvalidPayloadException;
 import com.starfireaviation.weather.exception.ResourceNotFoundException;
 import com.starfireaviation.weather.model.Barometer;
 import com.starfireaviation.weather.model.Ceiling;
@@ -45,8 +44,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 

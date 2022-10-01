@@ -27,7 +27,7 @@
 	</parent>
 	<groupId>com.starfireaviation</groupId>
 	<artifactId>weather</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>weather</name>
 	<description>Weather services</description>
 	<properties>
@@ -42,7 +42,21 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
-
+		<dependency>
+			<groupId>com.h2database</groupId>
+			<artifactId>h2</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.bouncycastle</groupId>
+			<artifactId>bcprov-jdk15on</artifactId>
+			<version>1.70</version>
+		</dependency>
+		<dependency>
+			<groupId>org.xerial</groupId>
+			<artifactId>sqlite-jdbc</artifactId>
+			<version>3.36.0.3</version>
+		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -62,6 +76,12 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 	</dependencies>
 	<reporting>
@@ -115,30 +135,6 @@
 						</exclude>
 					</excludes>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>com.github.spotbugs</groupId>
-				<artifactId>spotbugs-maven-plugin</artifactId>
-				<version>4.5.3.0</version>
-				<configuration>
-					<excludeFilterFile>
-						${project.build.directory}/classes/spotbugs-exclude.xml
-					</excludeFilterFile>
-					<effort>Max</effort>
-					<threshold>Low</threshold>
-					<xmlOutput>true</xmlOutput>
-					<!-- Ensures spotbugs does not run against the instrumented code created by clover. -->
-					<classFilesDirectory>${project.build.outputDirectory}</classFilesDirectory>
-				</configuration>
-				<executions>
-					<execution>
-						<id>analyze-bugs</id>
-						<phase>verify</phase>
-						<goals>
-							<goal>check</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 			<plugin>
 				<groupId>com.mycila</groupId>
@@ -301,7 +297,7 @@
 				<version>4.4.1</version>
 				<configuration>
 					<!--includesTestSourceRoots>false</includesTestSourceRoots-->
-					<targetPercentage>30%</targetPercentage>
+					<targetPercentage>8%</targetPercentage>
 					<generatePdf>true</generatePdf>
 					<generateHtml>true</generateHtml>
 					<!-- Verify that we can specify the JDK version for Clover's instrumentation -->

@@ -14,21 +14,7 @@
  *  limitations under the License.
  */
 
+/**
+ * Application classes.
+ */
 package com.starfireaviation.weather;
-
-import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-@SpringBootApplication
-public class WeatherApplication {
-
-    /**
-     * Main method.
-     *
-     * @param args arguments
-     */
-    public static void main(final String[] args) {
-        SpringApplication.run(WeatherApplication.class, args);
-    }
-
-}
