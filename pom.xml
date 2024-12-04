@@ -31,7 +31,8 @@
 	<name>weather</name>
 	<description>Weather services</description>
 	<properties>
-		<java.version>11</java.version>
+		<java.version>21</java.version>
+		<lombok.version>1.18.30</lombok.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -61,6 +62,7 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+			<version>${lombok.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
